@@ -1,7 +1,7 @@
 module controller_fsm #(parameter parity_on=1, parameter data_size=8, parameter sampling_cntr_width=4,
 parameter no_of_clks=16)(
 input clk,
-input rst, 
+input rst, //global rst (hard rst)
 input Tx_on,
 input [sampling_cntr_width-1:0] sampling_cntr_out,
 input [2 : 0] bits_cntr_out,
@@ -16,12 +16,12 @@ output reg data_seen // to indicate whether the data at the input port coild be 
 	 
 	 ///////////////////// state parameters ////////////////////////
 
-	 parameter state_reg_width= parity_on?3:2;
+	 parameter state_reg_width= parity_on?'d3:'d2;
 	 
-	 parameter [state_reg_width-1 : 0] idle=0, start=1, data_trans=2, parity_trans=4,stop=3;
+	 parameter [state_reg_width-1 : 0] idle='d0, start='d1, data_trans='d2, parity_trans='d4,stop='d3;
 	 reg [state_reg_width-1 : 0] next_state, state ;
 	 
-	 parameter [1:0] select_0=0, select_1=1, select_parity=3,select_data=2;
+	 parameter [1:0] select_0='d0, select_1='d1, select_parity='d3,select_data='d2;
 	
    //////////////////////// state register /////////////////
 	always @(posedge clk, posedge rst) begin
@@ -35,21 +35,21 @@ output reg data_seen // to indicate whether the data at the input port coild be 
 	
 	///////////////////// nextt state and output logic ////////////////////
 	always @(*)begin
-		cntr_rst=0;
-		sampling_end_val=0;
-		data_bits_incr=0;
-		data_w_en=1;
+		cntr_rst='d0;
+		sampling_end_val='d0;
+		data_bits_incr='d0;
+		data_w_en='d1;
 		select=select_1;
-		busy=0;
-		data_seen=0;
+		busy='d0;
+		data_seen='d0;
 		next_state =idle;
 		
 		if(state==idle)begin
-			cntr_rst = 1;
+			cntr_rst = 'd1;
 			select=select_1;
-			data_w_en=0;
-			data_seen=0;
-			if(Tx_on==1)begin
+			data_w_en='d0;
+			data_seen='d0;
+			if(Tx_on=='d1)begin
 				next_state = start;
 			end
 			else begin
@@ -58,11 +58,11 @@ output reg data_seen // to indicate whether the data at the input port coild be 
 		end
 		
 		if(state == start)begin
-			sampling_end_val = no_of_clks-1;
+			sampling_end_val = no_of_clks-'d1;
 			select=select_0;
-			busy=1;
-			data_seen=1;
-			data_w_en=1;
+			busy='d1;
+			data_seen='d1;
+			data_w_en='d1;
 			if(sampling_cntr_out == sampling_end_val) begin
 				next_state = data_trans;
 			end
@@ -72,14 +72,14 @@ output reg data_seen // to indicate whether the data at the input port coild be 
 		end
 		
 		if(state == data_trans) begin
-			sampling_end_val =no_of_clks-1;
-			data_w_en=0;
+			sampling_end_val =no_of_clks-'d1;
+			data_w_en='d0;
 			select=select_data;
-			busy=1;
-			data_seen=0;
+			busy='d1;
+			data_seen='d0;
 			if(sampling_cntr_out == sampling_end_val) begin
-				data_bits_incr =1;
-				if(bits_cntr_out == data_size-1) begin
+				data_bits_incr ='d1;
+				if(bits_cntr_out == data_size-'d1) begin
 					if(parity_on) next_state=parity_trans; else next_state=stop;
 				end
 				else begin
@@ -88,16 +88,16 @@ output reg data_seen // to indicate whether the data at the input port coild be 
 			end
 			else begin
 				next_state=data_trans;
-				data_bits_incr=0;
+				data_bits_incr='d0;
 			end
 		end
 		
 		if(state == stop)begin
-			sampling_end_val=no_of_clks-1;			
-			data_w_en=0;
+			sampling_end_val=no_of_clks-'d1;			
+			data_w_en='d0;
 			select=select_1;
-			busy=1;
-			data_seen=0;
+			busy='d1;
+			data_seen='d0;
 			if(sampling_cntr_out ==sampling_end_val) begin
 				if(Tx_on) next_state = start; else next_state=idle;
 			end
@@ -108,11 +108,11 @@ output reg data_seen // to indicate whether the data at the input port coild be 
 		
 		if(parity_on)begin
 			if(state == parity_trans)begin
-			sampling_end_val=no_of_clks-1;			
-			data_w_en=0;
+			sampling_end_val=no_of_clks-'d1;			
+			data_w_en='d0;
 			select=select_parity;
-			data_seen=0;
-			busy=1;
+			data_seen='d0;
+			busy='d1;
 			if(sampling_cntr_out ==sampling_end_val) begin
 					next_state = stop;
 				end

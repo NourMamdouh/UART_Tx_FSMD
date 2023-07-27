@@ -1,6 +1,6 @@
 module UART_Tx_top #(parameter parity_on=1, parameter data_size=8, parameter sampling_cntr_width=4,parameter even_parity=1,
 parameter no_of_clks=16,parameter BAUD_RATE=1000/*in kbits/s*/,parameter SYS_CLK_FREQ=BAUD_RATE*no_of_clks )(input clk,
-input rst,
+input rst, //global ASYNCH rst
 input Tx_on,
 input [data_size-1 : 0] Tx_input,
 output Tx_s,

@@ -1,11 +1,15 @@
 module manual_cntr #(parameter width =3)(input clk,
-input rst,
+input hard_rst,
+input soft_rst,
 input incr,
 output reg [width-1 :0] cnt_out
     );
 	 
-	 always @(posedge clk, posedge rst) begin
-		if(rst)begin
+	 always @(posedge clk, posedge hard_rst) begin
+		if(hard_rst)begin
+			cnt_out <= 0;
+		end
+		else if(soft_rst)begin
 			cnt_out <= 0;
 		end
 		else begin
