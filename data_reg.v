@@ -7,7 +7,7 @@ output reg [width-1 : 0] data_out
 	 
 	always @(posedge clk, posedge rst)begin
 		if(rst) begin
-			data_out <= 0;
+			data_out <= 'd0;
 		end 
 		else begin
 			if(w_en)begin
