@@ -16,16 +16,23 @@ output reg data_seen // to indicate whether the data at the input port coild be 
 	 
 	 ///////////////////// state parameters ////////////////////////
 
-	 parameter state_reg_width= parity_on?'d3:'d2;
-	 
-	 parameter [state_reg_width-1 : 0] idle='d0, start='d1, data_trans='d2, parity_trans='d4,stop='d3;
-	 reg [state_reg_width-1 : 0] next_state, state ;
-	 
-	 parameter [1:0] select_0='d0, select_1='d1, select_parity='d3,select_data='d2;
-	 
 	 if(parity_on=='d1)begin
 		`define P_on
-	 end	 
+	 end
+	 
+	 `ifdef P_on
+		localparam state_reg_width = 'd3;
+		//state encoding -- (gray coding)
+		localparam [state_reg_width-1 : 0] idle='b000, start='b001, data_trans='b011, parity_trans='b010,stop='b110;
+	 `else
+		localparam state_reg_width = 'd2;
+		//state encoding -- (gray coding)
+		localparam [state_reg_width-1 : 0] idle='b00, start='b01, data_trans='b11,stop='b10;
+	`endif	 
+	 
+	 reg [state_reg_width-1 : 0] next_state, state ;
+	 
+	 localparam [1:0] select_0='d1, select_1='d0, select_parity='d2,select_data='d3; //gray coding	 
 	
    //////////////////////// state register /////////////////
 	always @(posedge clk, posedge rst) begin

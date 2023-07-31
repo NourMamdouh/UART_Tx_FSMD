@@ -43,7 +43,7 @@ output reg Tx_s
     );
 
 	//////////////////////////////////
-	parameter [1:0] select_0='d0, select_1='d1, select_parity='d3,select_data='d2;
+	localparam [1:0] select_0='d1, select_1='d0, select_parity='d2,select_data='d3; //gray coding
 	wire parity; 
 	
 	always @(*)begin
