@@ -13,7 +13,7 @@ output data_seen // to indicate whether the data at the input port coild be seen
 	 wire [sampling_cntr_width-1:0] sampling_end_val, sampling_cntr_out;
 	 wire [2:0] bits_cntr_out;
 	 
-	 data_path #(.parity_on(parity_on),.data_size(data_size),.sampling_cntr_width(sampling_cntr_width),.even_parity(even_parity))Tx_data_path (
+	 Tx_dataPath #(.parity_on(parity_on),.data_size(data_size),.sampling_cntr_width(sampling_cntr_width),.even_parity(even_parity))Tx_data_path (
     .clk(clk), 
     .rst(rst), 
     .cntr_rst(cntr_rst), 
@@ -27,7 +27,7 @@ output data_seen // to indicate whether the data at the input port coild be seen
     .Tx_s(Tx_s)
     );
 	 
-	 controller_fsm #(.parity_on(parity_on),.data_size(data_size),.sampling_cntr_width(sampling_cntr_width),.no_of_clks(no_of_clks))Tx_controller (
+	 Tx_controller #(.parity_on(parity_on),.data_size(data_size),.sampling_cntr_width(sampling_cntr_width),.no_of_clks(no_of_clks))Tx_controller (
     .clk(clk), 
     .rst(rst), 
     .Tx_on(Tx_on), 

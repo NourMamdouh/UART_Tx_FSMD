@@ -69,7 +69,10 @@ output reg Tx_s
 	////////////////////////////
 	 generate 
 	 if(parity_on) begin
-		assign parity = even_parity? ^Tx_out : !(^Tx_out) ;
+		if(even_parity)
+			assign parity = ^Tx_out; 
+		else
+			assign parity = !(^Tx_out) ;
 	 end
 	 endgenerate
 	 //////////////////////////
